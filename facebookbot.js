@@ -2,7 +2,7 @@ var fs = require('fs');
 var Bot = require('node-telegram-bot');
 var login = require("facebook-chat-api");
 
-if (!process.env.TELEGRAM_USER || !process.env.APP_TOKEN)
+if (!process.env.TELEGRAM_USER_ID || !process.env.TELEGRAM_TOKEN)
     return console.log("Please define this env variables -- TELEGRAM_USER - APP_TOKEN");
 
 var owner = {username: process.env.TELEGRAM_USER, chat_id: process.env.CHAT_ID || undefined};
@@ -22,11 +22,8 @@ var friends = {};
 var threadListTmp;
 var currentThreadId;
 
-var config;
-config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 
-
-login({email: config.email, password: config.password}, async function (err, api) {
+login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASSWORD}, async function (err, api) {
     if (err) return console.error(err);
 
     await retrieveFriendsFromFacebook(api);
@@ -94,7 +91,7 @@ login({email: config.email, password: config.password}, async function (err, api
                     if (message.photo != undefined) {
                         bot.getFile({
                             file_id: message.photo[message.photo.length - 1].file_id,
-                            dir: config.dir
+                            dir: '/'
                         }, function callback(err, arr) {
                             api.sendMessage({attachment: fs.createReadStream(arr.destination)}, currentThreadId, function (err, api) {
                                 if (err) return console.error(err);
