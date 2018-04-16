@@ -127,7 +127,20 @@ function initListeners()
                             }
                         });
 	});
-	
+
+
+	bot.onText(/\/start/, (msg, match) => {
+	  const chatId = msg.chat.id;
+	  if (!doAuth(msg)) return;	
+      
+                        bot.sendMessage(msg.chat.id,
+                            getUsage(),{
+                            disable_web_page_preview: true
+                        });
+	});	
+
+    
+    
 	bot.on('message', (msg) => {
 	  const chatId = msg.chat.id;
 	  if (!doAuth(msg)) return;	
@@ -179,12 +192,7 @@ function initListeners()
                                 msg.chat.id,
                                 "I do not know him, Please give me a correct name or /cancel."
                             );
-          } else {
-                    bot.sendMessage(msg.chat.id,
-                            getUsage(),{
-                            disable_web_page_preview: true
-                        });
-                }
+          } 
     
 	});	  
 }
