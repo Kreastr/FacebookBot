@@ -1,5 +1,5 @@
 var fs = require('fs');
-var Bot = require('node-telegram-bot');
+var Bot = require('node-telegram-bot-api');
 var login = require("facebook-chat-api");
 
 if (!process.env.TELEGRAM_USER_ID || !process.env.TELEGRAM_TOKEN)
@@ -23,13 +23,38 @@ var threadListTmp;
 var currentThreadId;
 
 
-login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASSWORD}, async function (err, api) {
-    if (err) return console.error(err);
+// Start Telegram Bot
+var bot = new TelegramBot(login, {polling: true});
 
-    await retrieveFriendsFromFacebook(api);
+//listen telegram message
 
-    //listen telegram message
-    var bot = new Bot({
+function doAuth(msg)
+{
+	if (msg.from.id == owner.username)
+		return true;
+	bot.sendMessage( msg.chat.id, "I don't know you, "+msg.from.id);
+}
+
+function initListeners()
+{
+	bot.onText(/\/echo (.+)/, (msg, match) => {
+	  const chatId = msg.chat.id;
+	  const resp = match[1]; // the captured "whatever"
+	  doAuth(msg)
+	  // send back the matched "whatever" to the chat
+	  bot.sendMessage(chatId, resp);
+	});
+
+	bot.onText(/\/echo (.+)/, (msg, match) => {
+	  const chatId = msg.chat.id;
+	  const resp = match[1]; // the captured "whatever"
+	  doAuth(msg)	
+	  // send back the matched "whatever" to the chat
+	  bot.sendMessage(chatId, resp);
+	});
+}
+/*
+var bot = new Bot({
         token: process.env.APP_TOKEN
     }).on('message', async function (message) {
         if (message.from.username != owner.username)
@@ -147,6 +172,12 @@ login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASS
         }
     }).start();
 
+*/
+
+login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASSWORD}, async function (err, api) {
+    if (err) return console.error(err);
+
+    await retrieveFriendsFromFacebook(api);
 
     //listen message from FB and forward to telegram
 
