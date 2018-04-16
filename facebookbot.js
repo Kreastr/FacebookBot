@@ -24,7 +24,7 @@ var currentThreadId;
 
 
 // Start Telegram Bot
-var bot = new Bot(login, {polling: true});
+var bot = new Bot(process.env.TELEGRAM_TOKEN, {polling: true});
 
 //listen telegram message
 
