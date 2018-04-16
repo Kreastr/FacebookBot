@@ -34,9 +34,9 @@ function doAuth(msg)
 	console.log(msg)
 	if (msg.from.username== owner.username)
 		if (owner.chat_id == undefined)
-                	owner.chat_id = msg.chat.id; 
-		return true;
-	bot.sendMessage( msg.chat.id, "I don't know you, "+msg.from.username);
+                owner.chat_id = msg.chat.id; 
+           return true;
+	bot.sendMessage( ""+msg.chat.id, "I don't know you, "+msg.from.username);
 	return false;
 }
 
@@ -94,21 +94,19 @@ function initListeners()
 	  if (!doAuth(msg)) return;	
 
 	  if (currentThreadId != undefined) {
-                    if (message.photo != undefined) {
-                        bot.getFile({
-                            file_id: message.photo[message.photo.length - 1].file_id,
+                    if (msg.photo != undefined) {
+                        bot.getFile(msg.photo[msg.photo.length - 1].file_id,{
                             dir: '/'
-                        }, function callback(err, arr) {
+                        }).then( function(arr) {
                             api.sendMessage({attachment: fs.createReadStream(arr.destination)}, currentThreadId, function (err, api) {
-                                if (err) return console.error(err);
                                 fs.unlink(arr.destination, function (err) {
                                     if (err) throw err;
                                 });
                             });
-
+                            });
                         });
                     } else {
-                        api.sendMessage(message.text,
+                        api.sendMessage(msg.text,
                             currentThreadId, function (err, api) {
                                 if (err) return console.error(err);
                             });
@@ -116,13 +114,13 @@ function initListeners()
            } else if (threadListTmp != undefined) { //Check if owner have send a good recipient name
                     currentThreadId = undefined;
                     for (var x = 0; x < threadListTmp.length; x++) {
-                        if (threadListTmp[x].name == message.text)
+                        if (threadListTmp[x].name == msg.text)
                             currentThreadId = threadListTmp[x].threadID;
                     }
 
                     if (currentThreadId != undefined)
                         bot.sendMessage(
-                                message.chat.id,
+                                msg.chat.id,
                                 "What is the message for him ?",{
                                 reply_markup: {
                                     hide_keyboard: true
@@ -130,15 +128,16 @@ function initListeners()
                             });
                     else
                         bot.sendMessage(
-                                message.chat.id,
+                                msg.chat.id,
                                 "I do not know him, Please give me a correct name or /cancel."
                             );
           } else {
-                    bot.sendMessage(message.chat.id,
+                    bot.sendMessage(msg.chat.id,
                             getUsage(),{
                             disable_web_page_preview: true
                         });
                 }
+    
 	});	  
 }
 
