@@ -94,6 +94,15 @@ function initListeners()
 	  const chatId = msg.chat.id;
 	  if (!doAuth(msg)) return;	
 
+      if (!!msg.reply_to_message
+                && !!chat[msg.reply_to_message.message_id]) { //it is a reply message from FB
+
+                api.sendMessage(msg.text,
+                    chat[msg.reply_to_message.message_id], function (err, api) {
+                        if (err) return console.error(err);
+                    });
+            }
+
 	  if (currentThreadId != undefined) {
                     if (msg.photo != undefined) {
                         bot.getFile(msg.photo[msg.photo.length - 1].file_id,{
@@ -195,7 +204,8 @@ const sendTextMessageToTelegram = function (bot, senderName, message, text) {
         forwardmsg = message.threadID + ": " + forwardmsg;
     }
 
-    bot.sendMessage(owner.chat_id, forwardmsg,)
+    bot.sendMessage(owner.chat_id, forwardmsg)
+    chat[res.message_id] = message.threadID;
 };
 
 const sendAttachmentsToTelegram = function (bot, senderName, message) {
