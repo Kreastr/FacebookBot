@@ -72,8 +72,7 @@ function initListeners()
                         });
                     });
 
-		});
-	}
+	});
 
 	bot.onText(/\/cancel/, (msg, match) => {
 	  const chatId = msg.chat.id;
@@ -86,7 +85,7 @@ function initListeners()
                                 hide_keyboard: true
                             }
                         });
-	}
+	});
 	
 	bot.on('message', (msg) => {
 	  const chatId = msg.chat.id;
@@ -129,8 +128,8 @@ function initListeners()
                             });
                     else
                         bot.sendMessage(
-                                chat_id: message.chat.id,
-                                text: "I do not know him, Please give me a correct name or /cancel."
+                                message.chat.id,
+                                "I do not know him, Please give me a correct name or /cancel."
                             );
           } else {
                     bot.sendMessage(message.chat.id,
@@ -138,40 +137,8 @@ function initListeners()
                             disable_web_page_preview: true
                         });
                 }
-	}	  
+	});	  
 }
-
-var bot = new Bot({
-        token: process.env.APP_TOKEN
-    }).on('message', async function (message) {
-        if (message.from.username != owner.username)
-            bot.sendMessage({
-                chat_id: message.chat.id,
-                text: "You are not my owner! Go away ! \n"
-                + "- https://github.com/Liryna/FacebookBot"
-            });
-        else {
-            if (owner.chat_id == undefined)
-                owner.chat_id = message.chat.id; //save owner chat id - TODO save in config file
-
-            if (!!message.reply_to_message
-                && !!chat[message.reply_to_message.message_id]) { //it is a reply message from FB
-
-                api.sendMessage(message.text,
-                    chat[message.reply_to_message.message_id], function (err, api) {
-                        if (err) return console.error(err);
-                    });
-            } else {
-
-                if (message.text == "/threadlist") {
-                    
-                } else if (message.text == "/cancel") {
-                    
-                } else 
-            }
-        }
-    }).start();
-
 
 initListeners();
 
