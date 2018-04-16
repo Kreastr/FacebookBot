@@ -31,8 +31,11 @@ var bot = new Bot(process.env.TELEGRAM_TOKEN, {polling: true});
 function doAuth(msg)
 {
 	if (msg.from.id == owner.username)
+		if (owner.chat_id == undefined)
+                	owner.chat_id = msg.chat.id; 
 		return true;
 	bot.sendMessage( msg.chat.id, "I don't know you, "+msg.from.id);
+	return false;
 }
 
 function initListeners()
@@ -40,20 +43,104 @@ function initListeners()
 	bot.onText(/\/echo (.+)/, (msg, match) => {
 	  const chatId = msg.chat.id;
 	  const resp = match[1]; // the captured "whatever"
-	  doAuth(msg)
+	  if (!doAuth(msg)) return;
 	  // send back the matched "whatever" to the chat
 	  bot.sendMessage(chatId, resp);
 	});
 
-	bot.onText(/\/echo (.+)/, (msg, match) => {
+	bot.onText(/\/threadlist/, (msg, match) => {
 	  const chatId = msg.chat.id;
-	  const resp = match[1]; // the captured "whatever"
-	  doAuth(msg)	
-	  // send back the matched "whatever" to the chat
-	  bot.sendMessage(chatId, resp);
-	});
+	  if (!doAuth(msg)) return;	
+		
+	  api.getThreadList(0, maxThreadNb, function callback(err, arr) {
+
+                        var ft = require('./lib/findThread');
+                        var fbids = ft.getParticipantsIds(arr);
+                        currentThreadId = undefined; //reset current thread
+
+                        api.getUserInfo(fbids, function (err, ret) {
+                            if (err) return console.error(err);
+
+                            ft.createThreads(arr, ret, function (conversatioNames, newThreadListTmp) {
+                                threadListTmp = newThreadListTmp;
+                                bot.sendMessage(msg.chat.id, "Who is the recipient ?",{
+                                    reply_markup: {
+                                        keyboard: conversatioNames
+                                    }
+                                })
+                            });
+                        });
+                    });
+
+		});
+	}
+
+	bot.onText(/\/cancel/, (msg, match) => {
+	  const chatId = msg.chat.id;
+	  if (!doAuth(msg)) return;	
+		reset();
+                bot.sendMessage(
+                            msg.chat.id,
+                            "Command canceled.",{
+                            reply_markup: {
+                                hide_keyboard: true
+                            }
+                        });
+	}
+	
+	bot.on('message', (msg) => {
+	  const chatId = msg.chat.id;
+	  if (!doAuth(msg)) return;	
+
+	  if (currentThreadId != undefined) {
+                    if (message.photo != undefined) {
+                        bot.getFile({
+                            file_id: message.photo[message.photo.length - 1].file_id,
+                            dir: '/'
+                        }, function callback(err, arr) {
+                            api.sendMessage({attachment: fs.createReadStream(arr.destination)}, currentThreadId, function (err, api) {
+                                if (err) return console.error(err);
+                                fs.unlink(arr.destination, function (err) {
+                                    if (err) throw err;
+                                });
+                            });
+
+                        });
+                    } else {
+                        api.sendMessage(message.text,
+                            currentThreadId, function (err, api) {
+                                if (err) return console.error(err);
+                            });
+                    }
+           } else if (threadListTmp != undefined) { //Check if owner have send a good recipient name
+                    currentThreadId = undefined;
+                    for (var x = 0; x < threadListTmp.length; x++) {
+                        if (threadListTmp[x].name == message.text)
+                            currentThreadId = threadListTmp[x].threadID;
+                    }
+
+                    if (currentThreadId != undefined)
+                        bot.sendMessage(
+                                message.chat.id,
+                                "What is the message for him ?",{
+                                reply_markup: {
+                                    hide_keyboard: true
+                                }
+                            });
+                    else
+                        bot.sendMessage(
+                                chat_id: message.chat.id,
+                                text: "I do not know him, Please give me a correct name or /cancel."
+                            );
+          } else {
+                    bot.sendMessage(message.chat.id,
+                            getUsage(),{
+                            disable_web_page_preview: true
+                        });
+                }
+	}	  
 }
-/*
+
 var bot = new Bot({
         token: process.env.APP_TOKEN
     }).on('message', async function (message) {
@@ -77,103 +164,17 @@ var bot = new Bot({
             } else {
 
                 if (message.text == "/threadlist") {
-                    api.getThreadList(0, maxThreadNb, function callback(err, arr) {
-
-                        var ft = require('./lib/findThread');
-                        var fbids = ft.getParticipantsIds(arr);
-                        currentThreadId = undefined; //reset current thread
-
-                        api.getUserInfo(fbids, function (err, ret) {
-                            if (err) return console.error(err);
-
-                            ft.createThreads(arr, ret, function (conversatioNames, newThreadListTmp) {
-                                threadListTmp = newThreadListTmp;
-                                bot.sendMessage({
-                                    chat_id: message.chat.id,
-                                    text: "Who is the recipient ?",
-                                    reply_markup: {
-                                        keyboard: conversatioNames
-                                    }
-                                }, function (err, ret) {
-                                    if (err) return console.error(err);
-                                })
-                            });
-                        });
-                    });
+                    
                 } else if (message.text == "/cancel") {
-                    reset();
-                    bot.sendMessage({
-                            chat_id: message.chat.id,
-                            text: "Command canceled.",
-                            reply_markup: {
-                                hide_keyboard: true
-                            }
-                        },
-                        function (err, ret) {
-                            if (err) return console.error(err);
-                        });
-                } else if (currentThreadId != undefined) {
-                    if (message.photo != undefined) {
-                        bot.getFile({
-                            file_id: message.photo[message.photo.length - 1].file_id,
-                            dir: '/'
-                        }, function callback(err, arr) {
-                            api.sendMessage({attachment: fs.createReadStream(arr.destination)}, currentThreadId, function (err, api) {
-                                if (err) return console.error(err);
-                                fs.unlink(arr.destination, function (err) {
-                                    if (err) throw err;
-                                });
-                            });
-
-                        });
-                    } else {
-                        api.sendMessage(message.text,
-                            currentThreadId, function (err, api) {
-                                if (err) return console.error(err);
-                            });
-                    }
-                } else if (threadListTmp != undefined) { //Check if owner have send a good recipient name
-                    currentThreadId = undefined;
-                    for (var x = 0; x < threadListTmp.length; x++) {
-                        if (threadListTmp[x].name == message.text)
-                            currentThreadId = threadListTmp[x].threadID;
-                    }
-
-                    if (currentThreadId != undefined)
-                        bot.sendMessage({
-                                chat_id: message.chat.id,
-                                text: "What is the message for him ?",
-                                reply_markup: {
-                                    hide_keyboard: true
-                                }
-                            },
-                            function (err, ret) {
-                                if (err) return console.error(err);
-                            });
-                    else
-                        bot.sendMessage({
-                                chat_id: message.chat.id,
-                                text: "I do not know him, Please give me a correct name or /cancel."
-                            },
-                            function (err, ret) {
-                                if (err) return console.error(err);
-                            });
-                } else {
-                    bot.sendMessage({
-                            chat_id: message.chat.id,
-                            text: getUsage(),
-                            disable_web_page_preview: true
-                        },
-                        function (err, ret) {
-                            if (err) return console.error(err);
-                        });
-                }
+                    
+                } else 
             }
         }
     }).start();
 
-*/
-/*
+
+initListeners();
+
 login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASSWORD}, async function (err, api) {
     if (err) return console.error(err);
 
@@ -225,12 +226,7 @@ const sendTextMessageToTelegram = function (bot, senderName, message, text) {
         forwardmsg = message.threadID + ": " + forwardmsg;
     }
 
-    bot.sendMessage({chat_id: owner.chat_id, text: forwardmsg}, function (err, res) {
-        if (err) return console.error(err);
-
-        //save message id send and fb thread id for futur reply
-        chat[res.message_id] = message.threadID;
-    })
+    bot.sendMessage(owner.chat_id, forwardmsg,)
 };
 
 const sendAttachmentsToTelegram = function (bot, senderName, message) {
@@ -252,4 +248,4 @@ const sendAttachmentsToTelegram = function (bot, senderName, message) {
 function reset() {
     currentThreadId = undefined;
     threadListTmp = undefined;
-}*/
+}
