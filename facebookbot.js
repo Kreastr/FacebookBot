@@ -92,7 +92,7 @@ function initListeners()
 	  const chatId = msg.chat.id;
 	  if (!doAuth(msg)) return;	
 		
-	  api.getThreadList(maxThreadNb, 0, [],function callback(err, arr) {
+	  api.getThreadList(maxThreadNb, null, [],function callback(err, arr) {
                         if (err)
                             return console.error(err);
                         console.log("got FB Threads List")
