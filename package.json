@@ -15,7 +15,7 @@
   "homepage": "https://github.com/Liryna/FacebookBot",
   "dependencies": {
     "facebook-chat-api": "git+https://github.com/Schmavery/facebook-chat-api.git",
-    "node-telegram-bot": "^0.1.5"
+    "node-telegram-bot-api": "git+https://github.com/yagop/node-telegram-bot-api.git"
   },
   "scripts": {}
 }
