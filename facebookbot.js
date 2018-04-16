@@ -173,7 +173,7 @@ var bot = new Bot({
     }).start();
 
 */
-
+/*
 login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASSWORD}, async function (err, api) {
     if (err) return console.error(err);
 
@@ -252,4 +252,4 @@ const sendAttachmentsToTelegram = function (bot, senderName, message) {
 function reset() {
     currentThreadId = undefined;
     threadListTmp = undefined;
-}
+}*/
