@@ -38,7 +38,7 @@ function initFBlistener(){
             }
             else if (message) {
                 console.log("Got FB message")
-                sonsole.log(message)
+                console.log(message)
                 // gets the fb user name given his id
                 const senderName = friends[message.senderID] || message.senderID;
 
@@ -238,8 +238,13 @@ const sendTextMessageToTelegram = function (bot, senderName, message, text) {
         forwardmsg = message.threadID + ": " + forwardmsg;
     }
 
-    bot.sendMessage(owner.chat_id, forwardmsg)
+    bot.sendMessage(owner.chat_id, forwardmsg, function(err, res){
+    if (err) {
+            return console.error(err);
+        }
     chat[res.message_id] = message.threadID;
+    
+    });
 };
 
 const sendAttachmentsToTelegram = function (bot, senderName, message) {
