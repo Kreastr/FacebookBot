@@ -3,9 +3,9 @@ var Bot = require('node-telegram-bot-api');
 var login = require("facebook-chat-api");
 
 if (!process.env.TELEGRAM_USER_ID || !process.env.TELEGRAM_TOKEN)
-    return console.log("Please define this env variables -- TELEGRAM_USER - APP_TOKEN");
+    return console.log("Please define this env variables -- TELEGRAM_USER_ID - TELEGRAM_TOKEN");
 
-var owner = {username: process.env.TELEGRAM_USER, chat_id: process.env.CHAT_ID || undefined};
+var owner = {username: process.env.TELEGRAM_USER_ID, chat_id: process.env.CHAT_ID || undefined};
 var maxThreadNb = 10;
 
 function getUsage() {
@@ -14,7 +14,7 @@ function getUsage() {
         + "Available commands:\n"
         + "/threadlist - List the latest conversations you had with your friends.\n"
         + "/cancel - Cancel the current command.\n"
-        + "\n\nMore Informations: https://github.com/Liryna/FacebookBot";
+        + "\n\nMore Informations: https://github.com/Kreastr/FacebookBot";
 }
 
 var chat = new Array();
@@ -24,7 +24,7 @@ var currentThreadId;
 
 
 // Start Telegram Bot
-var bot = new TelegramBot(login, {polling: true});
+var bot = new Bot(login, {polling: true});
 
 //listen telegram message
 
