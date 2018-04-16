@@ -69,7 +69,7 @@ function initListeners()
                                     reply_markup: {
                                         keyboard: conversatioNames
                                     }
-                                })
+                                });
                             });
                         });
                     });
@@ -104,7 +104,7 @@ function initListeners()
                                 });
                             });
                             });
-                        });
+                        
                     } else {
                         api.sendMessage(msg.text,
                             currentThreadId, function (err, api) {
