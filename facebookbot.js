@@ -26,16 +26,53 @@ var currentThreadId;
 // Start Telegram Bot
 var bot = new Bot(process.env.TELEGRAM_TOKEN, {polling: true});
 
+
+
+var api = undefined;
+var fbReady = false;
+
+function initFBlistener(){
+    api.listen(function callback(err, message) {
+            if (err) {
+                console.error("Errors on facebook listening", err);
+            }
+            else if (message) {
+                console.log("Got FB message")
+                sonsole.log(message)
+                // gets the fb user name given his id
+                const senderName = friends[message.senderID] || message.senderID;
+
+                if (message.attachments.length > 0) {
+                    sendAttachmentsToTelegram(bot, senderName, message);
+                } else {
+                    sendTextMessageToTelegram(bot, senderName, message, message.body);
+                }
+            } else {
+                console.log("no message from facebook");
+            }
+
+        });
+}
+
+
+
 //listen telegram message
+
 
 function doAuth(msg)
 {
 	console.log("New message in Telegram")
 	console.log(msg)
 	if (msg.from.username== owner.username)
+        {
 		if (owner.chat_id == undefined)
+                {
                 owner.chat_id = msg.chat.id; 
-           return true;
+                if (fbReady)
+                    initFBlistener();
+                }
+        return true;
+        }
 	bot.sendMessage( ""+msg.chat.id, "I don't know you, "+msg.from.username);
 	return false;
 }
@@ -153,6 +190,8 @@ function initListeners()
 
 initListeners();
 
+
+
 login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASSWORD}, async function (err, api) {
     if (err) return console.error(err);
 
@@ -162,27 +201,9 @@ login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASS
 
     if (!owner.chat_id) {
         console.error("No chat id found.");
+        fbReady = true;
     } else {
-        api.listen(function callback(err, message) {
-            if (err) {
-                console.error("Errors on facebook listening", err);
-            }
-            else if (message) {
-                console.log("Got FB message")
-                sonsole.log(message)
-                // gets the fb user name given his id
-                const senderName = friends[message.senderID] || message.senderID;
-
-                if (message.attachments.length > 0) {
-                    sendAttachmentsToTelegram(bot, senderName, message);
-                } else {
-                    sendTextMessageToTelegram(bot, senderName, message, message.body);
-                }
-            } else {
-                console.log("no message from facebook");
-            }
-
-        });
+        initFBlistener();
     }
 });
 
