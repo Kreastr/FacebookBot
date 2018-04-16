@@ -193,11 +193,11 @@ initListeners();
 
 
 
-login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASSWORD}, async function (err, api) {
+login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASSWORD}, async function (err, lapi) {
     if (err) return console.error(err);
 
-    await retrieveFriendsFromFacebook(api);
-
+    await retrieveFriendsFromFacebook(lapi);
+    api = lapi;
     //listen message from FB and forward to telegram
 
     if (!owner.chat_id) {
