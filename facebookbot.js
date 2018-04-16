@@ -98,7 +98,7 @@ function initListeners()
                         console.log("got FB Threads List")
                         console.log(arr)
                         var ft = require('./lib/findThread');
-                        var fbids = [].concat.apply([], arr.map(el => el.participantIDs)); //Extract IDs and merge them into a single array
+                        var fbids = arr.map(el => el.participantIDs); //Extract IDs 
                         currentThreadId = undefined; //reset current thread
 
                         api.getUserInfo(fbids, function (err, ret) {
