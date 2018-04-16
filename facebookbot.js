@@ -168,6 +168,8 @@ login({email: process.env.FACEBOOK_USERNAME, password: process.env.FACEBOOK_PASS
                 console.error("Errors on facebook listening", err);
             }
             else if (message) {
+                console.log("Got FB message")
+                sonsole.log(message)
                 // gets the fb user name given his id
                 const senderName = friends[message.senderID] || message.senderID;
 
