@@ -55,7 +55,8 @@ function initListeners()
 	  if (!doAuth(msg)) return;	
 		
 	  api.getThreadList(0, maxThreadNb, function callback(err, arr) {
-
+                        if (err)
+                            return console.error(err);
                         var ft = require('./lib/findThread');
                         var fbids = ft.getParticipantsIds(arr);
                         currentThreadId = undefined; //reset current thread
