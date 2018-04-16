@@ -104,7 +104,7 @@ function initListeners()
                         api.getUserInfo(fbids, function (err, ret) {
                             if (err) return console.error(err);
 
-                            ft.createThreads(arr, ret, function (conversatioNames, newThreadListTmp) {
+                            ft.createThreads(arr, function (conversatioNames, newThreadListTmp) {
                                 threadListTmp = newThreadListTmp;
                                 bot.sendMessage(msg.chat.id, "Who is the recipient ?",{
                                     reply_markup: {
