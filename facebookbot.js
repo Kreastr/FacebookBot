@@ -32,11 +32,11 @@ function doAuth(msg)
 {
 	console.log("New message in Telegram")
 	console.log(msg)
-	if (msg.from.id == owner.username)
+	if (msg.from.username== owner.username)
 		if (owner.chat_id == undefined)
                 	owner.chat_id = msg.chat.id; 
 		return true;
-	bot.sendMessage( msg.chat.id, "I don't know you, "+msg.from.id);
+	bot.sendMessage( msg.chat.id, "I don't know you, "+msg.from.username);
 	return false;
 }
 
