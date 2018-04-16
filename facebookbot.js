@@ -68,6 +68,7 @@ function doAuth(msg)
 		if (owner.chat_id == undefined)
                 {
                 owner.chat_id = msg.chat.id; 
+                console.log("Late start for FB listener")
                 if (fbReady)
                     initFBlistener();
                 }
