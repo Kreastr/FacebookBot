@@ -158,9 +158,7 @@ function initListeners()
 
 	  if (currentThreadId != undefined) {
                     if (msg.photo != undefined) {
-                        bot.getFile(msg.photo[msg.photo.length - 1].file_id,{
-                            dir: '/'
-                        }).then( function(arr) {
+                        bot.downloadFile(msg.photo[msg.photo.length - 1].file_id,'/app/').then( function(arr) {
                             api.sendMessage({attachment: fs.createReadStream(arr.destination)}, currentThreadId, function (err, api) {
                                 fs.unlink(arr.destination, function (err) {
                                     if (err) throw err;
@@ -169,9 +167,7 @@ function initListeners()
                             });
                         
                     } else if (msg.sticker != undefined) {
-                        bot.getFile(msg.sticker[msg.sticker.length - 1].file_id,{
-                            dir: '/'
-                        }).then( function(arr) {
+                        bot.downloadFile(msg.sticker[msg.sticker.length - 1].file_id,'/app/').then( function(arr) {
                             api.sendMessage({attachment: fs.createReadStream(arr.destination)}, currentThreadId, function (err, api) {
                                 fs.unlink(arr.destination, function (err) {
                                     if (err) throw err;
