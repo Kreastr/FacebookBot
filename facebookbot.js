@@ -158,7 +158,7 @@ function initListeners()
 
 	  if (currentThreadId != undefined) {
                     if (msg.photo != undefined) {
-						for each (ph in msg.photo){
+						for (var ph in msg.photo){
 							bot.downloadFile(ph.file_id,'/app/').then( function(arr) {
 								api.sendMessage({attachment: fs.createReadStream(arr)}, currentThreadId, function (err, api) {
 									fs.unlink(arr, function (err) {
