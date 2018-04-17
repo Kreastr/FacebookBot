@@ -158,15 +158,14 @@ function initListeners()
 
 	  if (currentThreadId != undefined) {
                     if (msg.photo != undefined) {
-						for (var ph in msg.photo){
-							bot.downloadFile(ph.file_id,'/app/').then( function(arr) {
+							bot.downloadFile(msg.photo[msg.photo.length - 1].file_id,'/app/').then( function(arr) {
 								api.sendMessage({attachment: fs.createReadStream(arr)}, currentThreadId, function (err, api) {
 									fs.unlink(arr, function (err) {
 										if (err) throw err;
 									});
 								});
 								});
-                        }
+                        
                         
                     } else if (msg.sticker != undefined) {
                         bot.downloadFile(msg.sticker.file_id,'/app/').then( function(arr) {
