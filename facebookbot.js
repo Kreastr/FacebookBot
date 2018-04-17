@@ -146,7 +146,7 @@ function initListeners()
 	bot.on('message', (msg) => {
 	  const chatId = msg.chat.id;
 	  if (!doAuth(msg)) return;	
-
+	  if (msg.text[0] == '/') return;
       if (!!msg.reply_to_message
                 && !!chat[msg.reply_to_message.message_id]) { //it is a reply message from FB
 
