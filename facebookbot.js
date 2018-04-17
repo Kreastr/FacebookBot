@@ -247,7 +247,8 @@ const sendTextMessageToTelegram = function (bot, senderName, message, text) {
     if (message.isGroup) {
         forwardmsg = message.threadID + ": " + forwardmsg;
     }
-
+	console.log("Forwarding message to TG: ");
+	console.log(" - " + forwardmsg);
     bot.sendMessage(owner.chat_id, forwardmsg, function(err, res){
     if (err) {
             return console.error(err);
