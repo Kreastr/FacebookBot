@@ -168,7 +168,18 @@ function initListeners()
                             });
                             });
                         
-                    } else {
+                    } else if (msg.sticker != undefined) {
+                        bot.getFile(msg.sticker[msg.sticker.length - 1].file_id,{
+                            dir: '/'
+                        }).then( function(arr) {
+                            api.sendMessage({attachment: fs.createReadStream(arr.destination)}, currentThreadId, function (err, api) {
+                                fs.unlink(arr.destination, function (err) {
+                                    if (err) throw err;
+                                });
+                            });
+                            });
+                        
+                    } else{
                         api.sendMessage(msg.text,
                             currentThreadId, function (err, api) {
                                 if (err) return console.error(err);
