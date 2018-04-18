@@ -249,7 +249,7 @@ const sendTextMessageToTelegram = function (bot, senderName, message, text) {
     }
 	console.log("Forwarding message to TG: ");
 	console.log(" - " + forwardmsg);
-    bot.sendMessage(owner.chat_id, forwardmsg, function(err, res){
+    bot.sendMessage(owner.chat_id, forwardmsg).then(function(err, res){
     if (err) {
             return console.error(err);
         }
