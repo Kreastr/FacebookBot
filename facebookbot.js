@@ -176,6 +176,11 @@ function initListeners()
                                     if (err) throw err;
                                 });
                             });
+                            }).catch(function(arr) {
+								api.sendMessage(msg.sticker.emoji + " ("+msg.sticker.set_name+")",
+								currentThreadId, function (err, api) {
+									if (err) return console.error(err);
+								});
                             });
                         
                     } else{
@@ -254,7 +259,7 @@ const sendTextMessageToTelegram = function (bot, senderName, message, text) {
             return console.error(err);
         }
     chat[res.message_id] = message.threadID;
-    
+    console.log(chat);
     });
 };
 
