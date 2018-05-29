@@ -6,29 +6,24 @@ A Facebook bot for Telegram.
 
 ## Install
 - Create your Telegram bot, follow the instruction [here](https://core.telegram.org/bots#3-how-do-i-create-a-bot).
-- Clone this repository and install nodejs package.
+- Clone this repository.
+- Install nodejs package.
 ```
-git clone https://github.com/Liryna/FacebookBot.git
 cd FacebookBot
 npm install
 ```
-- Create the configuration file `config.json`.
-```
-{
-  "email": "YOUR EMAIL",
-  "password": "YOUR PASSWORD",
-  "dir": "FacebookBot DIRECTORY"
-}
-```
+
 ##Usage
-- This bot require some additional information in the your environment variables.
+- This bot requires some additional information in your environment variables.
 ```
-TELEGRAM_USER="your telegram login"
-APP_TOKEN="the token of your bot that BotFather gave you"
+TELEGRAM_USER_ID="your telegram user id"
+TELEGRAM_TOKEN="the token of your bot that BotFather gave you"
+FACEBOOK_USERNAME="your facebook username"
+FACEBOOK_PASSWORD="your facebook password"
 ```
 - Run it.
 ```
-TELEGRAM_USER="Mario" APP_TOKEN="TOKEN" node facebookbot.js
+node facebookbot.js
 ```
 - The bot cannot establish a conversation to you directly, you need to write him first. Use your Telegram Client to say him "Hello".
 - The Available commands to send to your bot:
@@ -39,4 +34,4 @@ TELEGRAM_USER="Mario" APP_TOKEN="TOKEN" node facebookbot.js
 
 ## Dependencies
 
-This bot use [Schmavery/facebook-chat-api](https://github.com/Schmavery/facebook-chat-api) and [depoio/node-telegram-bot](https://github.com/depoio/node-telegram-bot).
+This bot use [ravkr/facebook-chat-api](https://github.com/ravkr/facebook-chat-api) and [yagop/node-telegram-bot-api](https://github.com/yagop/node-telegram-bot-api).
