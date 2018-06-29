@@ -17,7 +17,9 @@ function getUsage() {
         + "\n\nMore Informations: https://github.com/Kreastr/FacebookBot";
 }
 
-var chat = new Array();
+//when a Facebook message is fowarded to user:
+//key = TG message id, value = FB thread id
+var chat = new Map(); 
 var friends = {};
 var threadListTmp;
 var currentThreadId;
@@ -146,46 +148,34 @@ function initListeners()
 	bot.on('message', (msg) => {
 	  const chatId = msg.chat.id;
 	  if (!doAuth(msg)) return;	
-	  if (msg.text[0] == '/') return;
+	  if (msg.text != undefined && msg.text[0] == '/') return;
       if (!!msg.reply_to_message
-                && !!chat[msg.reply_to_message.message_id]) { //it is a reply message from FB
+                && !!chat.get(msg.reply_to_message.message_id)) { //it is a reply message from FB
 
                 api.sendMessage(msg.text,
-                    chat[msg.reply_to_message.message_id], function (err, api) {
+                    chat.get(msg.reply_to_message.message_id), function (err, messageInfo) {
                         if (err) return console.error(err);
                     });
             }
 
 	  if (currentThreadId != undefined) {
                     if (msg.photo != undefined) {
-							bot.downloadFile(msg.photo[msg.photo.length - 1].file_id,'/app/').then( function(arr) {
-								api.sendMessage({attachment: fs.createReadStream(arr)}, currentThreadId, function (err, api) {
-									fs.unlink(arr, function (err) {
-										if (err) throw err;
-									});
-								});
-								});
-                        
-                        
+                    	sendAttachmentToFacebook(currentThreadId, msg.chat.id, msg.photo[msg.photo.length - 1].file_id, msg.caption);
                     } else if (msg.sticker != undefined) {
-                        bot.downloadFile(msg.sticker.file_id,'/app/').then( function(arr) {
-							console.log("Got path")
-							console.log(arr)
-                            api.sendMessage({attachment: fs.createReadStream(arr)}, currentThreadId, function (err, api) {
-                                fs.unlink(arr, function (err) {
-                                    if (err) throw err;
-                                });
-                            });
-                            }).catch(function(arr) {
-								api.sendMessage(msg.sticker.emoji + " ("+msg.sticker.set_name+")",
-								currentThreadId, function (err, api) {
-									if (err) return console.error(err);
-								});
-                            });
-                        
-                    } else{
+                    	sendAttachmentToFacebook(currentThreadId, msg.chat.id, msg.sticker.file_id);
+                    } else if (msg.audio != undefined) {
+                        sendAttachmentToFacebook(currentThreadId, msg.chat.id, msg.audio.file_id, msg.caption);
+                    } else if (msg.voice != undefined) {
+                        sendAttachmentToFacebook(currentThreadId, msg.chat.id, msg.voice.file_id, msg.caption);
+                    } else if (msg.video != undefined) {
+                        sendAttachmentToFacebook(currentThreadId, msg.chat.id, msg.video.file_id, msg.caption);
+                    } else if (msg.video_note != undefined) {
+                        sendAttachmentToFacebook(currentThreadId, msg.chat.id, msg.video_note.file_id);
+                    } else if (msg.document != undefined) {
+                        sendAttachmentToFacebook(currentThreadId, msg.chat.id, msg.document.file_id, msg.caption);
+                    } else {
                         api.sendMessage(msg.text,
-                            currentThreadId, function (err, api) {
+                            currentThreadId, function (err, messageInfo) {
                                 if (err) return console.error(err);
                             });
                     }
@@ -254,12 +244,9 @@ const sendTextMessageToTelegram = function (bot, senderName, message, text) {
     }
 	console.log("Forwarding message to TG: ");
 	console.log(" - " + forwardmsg);
-    bot.sendMessage(owner.chat_id, forwardmsg).then(function(err, res){
-    if (err) {
-            return console.error(err);
-        }
-    chat[res.message_id] = message.threadID;
-    console.log(chat);
+    bot.sendMessage(owner.chat_id, forwardmsg).then(function(err, tgMessage) {
+        if(err) throw err;
+        chat.set(tgMessage.message_id, message.thread_id);
     });
 };
 
@@ -277,6 +264,25 @@ const sendAttachmentsToTelegram = function (bot, senderName, message) {
 
 
     }
+}
+
+const sendAttachmentToFacebook = function (fbThreadID, tgChatID, file_id, caption) {
+    if(!process.env.FACEBOOK_BOT_DIR) {
+        bot.sendMessage(tgChatID, "Bot cache directory (FACEBOOK_BOT_DIR environment var) is not defiend, cannot send attachments.");
+        return;
+    }
+    //would be cool if this worked, can't bother to fix though
+    // api.sendMessage({body: caption, attachment: bot.getFileStream(file_id)}, fbThreadID, function (err, messageInfo) {
+    //     if(err) throw err;
+    // });
+    
+    return bot.downloadFile(file_id, process.env.FACEBOOK_BOT_DIR).then( function(arr) {
+        api.sendMessage({body: caption, attachment: fs.createReadStream(arr)}, fbThreadID, function (err, messageInfo) {
+            fs.unlink(arr, function (err) {
+                if (err) throw err;
+            });
+        });
+    })
 }
 
 function reset() {
