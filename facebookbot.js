@@ -17,6 +17,8 @@ function getUsage() {
         + "\n\nMore Informations: https://github.com/Kreastr/FacebookBot";
 }
 
+var botWorkingDir = process.env.FACEBOOK_BOT_DIR || (__dirname + "/data");
+
 //when a Facebook message is fowarded to user:
 //key = TG message id, value = FB thread id
 var chat = new Map(); 
@@ -204,6 +206,14 @@ function initListeners()
 	});	  
 }
 
+
+if (!fs.existsSync(botWorkingDir)) {
+    fs.mkdirSync(botWorkingDir);
+}
+if (!fs.existsSync(botWorkingDir + "/temp")){
+    fs.mkdirSync(botWorkingDir + "/temp");
+}
+console.log("Data directory: " + botWorkingDir);
 initListeners();
 
 
@@ -267,16 +277,12 @@ const sendAttachmentsToTelegram = function (bot, senderName, message) {
 }
 
 const sendAttachmentToFacebook = function (fbThreadID, tgChatID, file_id, caption) {
-    if(!process.env.FACEBOOK_BOT_DIR) {
-        bot.sendMessage(tgChatID, "Bot cache directory (FACEBOOK_BOT_DIR environment var) is not defiend, cannot send attachments.");
-        return;
-    }
     //would be cool if this worked, can't bother to fix though
     // api.sendMessage({body: caption, attachment: bot.getFileStream(file_id)}, fbThreadID, function (err, messageInfo) {
     //     if(err) throw err;
     // });
     
-    return bot.downloadFile(file_id, process.env.FACEBOOK_BOT_DIR).then( function(arr) {
+    return bot.downloadFile(file_id, botWorkingDir + "/temp").then( function(arr) {
         api.sendMessage({body: caption, attachment: fs.createReadStream(arr)}, fbThreadID, function (err, messageInfo) {
             fs.unlink(arr, function (err) {
                 if (err) throw err;
